@@ -6,6 +6,8 @@ import (
 	"crm/crmclientmanager"
 	"crm/crmsystem"
 	"crm/crmtype"
+	"crm/redis_connect"
+	"crm/subsription"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -112,12 +114,25 @@ func runRestApi(*cli.Context) error{
 	router.Methods("GET").Path("/crmtypes/{id}").HandlerFunc(crmtypesendpoints.GetById("id"))
 	router.Methods("PUT").Path("/crmtypes/{id}").HandlerFunc(crmtypesendpoints.Update("id"))
 	router.Methods("DELETE").Path("/crmtypes/{id}").HandlerFunc(crmtypesendpoints.Delete("id"))
+	//subscriptions
+	subsriptionsrepo,err:=subsription.NewPostgreStore(conf)
+	if err!=nil{
+		return nil
+	}
+	subscriptionsservice:=subsription.NewInternship(subsriptionsrepo)
+	subscriptionensdpoints:=subsription.NewEndpoints(subscriptionsservice)
+	router.Methods("POST").Path("/subscriptions/").HandlerFunc(subscriptionensdpoints.Add())
+	router.Methods("GET").Path("/subscriptions/").HandlerFunc(subscriptionensdpoints.Get())
+	router.Methods("GET").Path("/subscriptions/{id}").HandlerFunc(subscriptionensdpoints.GetById("id"))
+	router.Methods("PUT").Path("/subscriptions/{id}").HandlerFunc(subscriptionensdpoints.Update("id"))
+	router.Methods("DELETE").Path("/subscriptions/{id}").HandlerFunc(subscriptionensdpoints.Delete("id"))
 	//crmsystems
+	redisconnect := redis_connect.ConnectRedis()
 	crmsystems,err:=crmsystem.NewPostgreStore(conf)
 	if err!=nil{
 		return err
 	}
-	crmsystemsservice:=crmsystem.NewInternship(crmsystems)
+	crmsystemsservice:=crmsystem.NewInternship(crmsystems,redisconnect)
 	crmsystemsendpoints:=crmsystem.NewEndpoints(crmsystemsservice)
 	router.Methods("POST").Path("/crmsystems/").HandlerFunc(crmsystemsendpoints.Add())
 	router.Methods("GET").Path("/crmsystems/").HandlerFunc(crmsystemsendpoints.Get())

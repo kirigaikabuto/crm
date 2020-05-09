@@ -2,6 +2,7 @@ package clients
 
 import (
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -61,6 +62,13 @@ func(inter *internshipStruct) checkForEmail(obj *Client) error {
 	}
 	return nil
 }
+func(inter *internshipStruct) getHashPassword(password string) (string,error){
+	hash,err:=bcrypt.GenerateFromPassword([]byte(password),5)
+	if err!=nil{
+		return "",err
+	}
+	return string(hash),nil
+}
 func(inter *internshipStruct) Add(obj *Client) (*Client,error){
 	err:=inter.checkForEmpty(obj)
 	if err!=nil{
@@ -76,6 +84,11 @@ func(inter *internshipStruct) Add(obj *Client) (*Client,error){
 	}
 	obj.CreatedAt = time.Now()
 	obj.UpdatedAt = time.Now()
+	hash,err := inter.getHashPassword(obj.Password)
+	if err!=nil{
+		return nil,err
+	}
+	obj.Password = hash
 	newobj,err:=inter.Repo.Add(obj)
 	return newobj,err
 }

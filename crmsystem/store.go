@@ -36,6 +36,7 @@ func createSchema(db *pg.DB) error{
 }
 
 func (rep *repo) Add(obj *CrmSystem) (*CrmSystem,error){
+	
 	err:=rep.db.Insert(obj)
 	if err!=nil{
 		return nil, err

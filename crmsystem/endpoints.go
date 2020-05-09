@@ -127,7 +127,7 @@ func(ef *endpointsFactory) GetById(idParam string)  func(w http.ResponseWriter,r
 		obj, err := ef.Inter.GetById(id)
 		if err != nil {
 			respondJSON(w, http.StatusInternalServerError, &customError{
-				"no object by id",
+				err.Error(),
 			})
 			return
 		}

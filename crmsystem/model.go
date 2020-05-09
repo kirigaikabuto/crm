@@ -11,11 +11,12 @@ type Repository interface {
 	Update(obj *CrmSystem) (*CrmSystem,error)
 	GetByClientId(id int64) (*CrmSystem,error)
 }
-type CrmSystem struct {
+type CrmSystem struct {	
 	Id        int64  `json:"id" pg:"id,pk"`
 	ClientId int64 `json:"client_id,omitempty" pg:"client_id"`
 	TypeId int64 `json:"type_id,omitempty" pg:"type_id"`
 	SubscriptionId int64 `json:"subscription_id,omitempty" pg:"subscription_id"`
+	SubscriptionToken string `json:"subscription_token,omitempty" pg:"subscription_token"`
 	CreatedAt time.Time `json:"created_at,omitempty" pg:"created_at"`
 	UpdatedAt time.Time `json:"updated_at,omitempty" pg:"updated_at"`
 }
